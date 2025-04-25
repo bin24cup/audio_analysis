@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Audio File</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+        h1 {
+            margin-bottom: 20px;  
+        }
+        form {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+        /* 新增样式 */
+        .language-form {
+            display: flex;
+            flex-direction: row; /* 设置子元素水平排列 */
+            justify-content: center; /* 水平居中 */
+            align-items: center; /* 垂直居中 */
+        }
+        .language-form input[type="submit"] {
+            margin-right: 10px; /* 为右侧按钮添加外边距 */
+        }
+    </style>
+</head>
+<body>
+    <h1>上传音频文件进行分析</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" required>
+        <input type="submit" value="上传">
+    </form>
+    <!-- 新增类名用于样式应用 -->
+    <form action="{{ url_for('set_language') }}" method="post" class="language-form">
+        <input type="submit" name="language" value="中文" /> 
+        <input type="submit" name="language" value="English" />
+    </form>
+</body>
+</html>

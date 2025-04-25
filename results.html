@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if language == '中文' %}音频分析结果{% else %}Audio Analysis Results{% endif %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            background-color: #f4f5f7;
+            font-family: 'Roboto', Arial, sans-serif;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 900px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .analysis-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .audio-player {
+            flex: 1;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .text-highlight {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 5px solid #007bff;
+        }
+        .animated-gif {
+            display: block;
+            margin: 0 auto;
+            max-width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .btn-custom {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+            text-decoration: none;
+        }
+        .icon {
+            color: #007bff;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center"><i class="icon fas fa-music"></i> {% if language == '中文' %}音频分析结果{% else %}Audio Analysis Results{% endif %}</h1>
+        
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+        {% else %}
+            <div class="mb-4">
+                <h2><i class="icon fas fa-play-circle"></i> {% if language == '中文' %}播放音频{% else %}Play Audio{% endif %}:</h2>
+                <audio controls class="w-100">
+                    <source src="{{ url_for('audio_file', filename=audio_features['filename']) }}" type="audio/wav">
+                    您的浏览器不支持音频元素。
+                </audio>
+            </div>
+
+            <div class="mb-4">
+                <h2><i class="icon fas fa-calculator"></i> {% if language == '中文' %}二次系数{% else %}Quadratic Coefficients{% endif %}</h2>
+                <p class="text-highlight">a: {{ coefficients['a'] }}</p>
+                <p class="text-highlight">b: {{ coefficients['b'] }}</p>
+                <p class="text-highlight">c: {{ coefficients['c'] }}</p>
+                <p>{% if language == '中文' %}二次方程为:{% else %}The quadratic equation is:{% endif %} 
+                    <strong>y = {{ coefficients['a'] }}x<sup>2</sup> + {{ coefficients['b'] }}x + {{ coefficients['c'] }}</strong>
+                </p>
+                <p class="text-highlight">{% if language == '中文' %}此方程表示能量谱的对数频率与对数能量之间的关系，帮助理解频率特性。{% else %}This equation represents the relationship between the logarithmic frequency and logarithmic energy of the power spectrum, helping to understand frequency characteristics.{% endif %}</p>
+            </div>
+
+            <div class="analysis-container">
+                <div>
+                    <h2><i class="icon fas fa-chart-bar"></i> {% if language == '中文' %}音频特征{% else %}Audio Features{% endif %}:</h2>
+                    <p class="text-highlight">{% if language == '中文' %}持续时间{% else %}Duration{% endif %}: {{ audio_features['duration'] }} seconds</p>
+                    <p class="text-highlight">{% if language == '中文' %}均方根{% else %}RMS{% endif %}: {{ audio_features['rms'] }}</p>
+                    <p class="text-highlight">{% if language == '中文' %}过零率{% else %}Zero Crossing Rate{% endif %}: {{ audio_features['zero_crossing_rate'] }}</p>
+                    <p class="text-highlight">{% if language == '中文' %}频谱质心{% else %}Spectral Centroid{% endif %}: {{ audio_features['spectral_centroid'] }}</p>
+                    <p class="text-highlight">{% if language == '中文' %}频谱带宽{% else %}Spectral Bandwidth{% endif %}: {{ audio_features['spectral_bandwidth'] }}</p>
+                    <p class="text-highlight">{% if language == '中文' %}音调{% else %}Pitch{% endif %}: {{ audio_features['pitch'] }}</p>
+                    <p>{{ audio_features['pitch_description'] }}</p>
+                    <p>{% if language == '中文' %}均方根 (RMS) 表示音频信号的能量水平。{% else %}The Root Mean Square (RMS) represents the energy level of the audio signal.{% endif %}</p>
+                    <p>{% if language == '中文' %}过零率是指信号通过零点的频率，反映了信号的粗糙程度。{% else %}Zero Crossing Rate indicates how often the signal changes from positive to negative, reflecting its noisiness.{% endif %}</p>
+                    <p>{% if language == '中文' %}频谱质心代表频率的中心位置，用来衡量音频的亮度。{% else %}Spectral Centroid represents the center of mass of the spectrum, often used as a measure of brightness.{% endif %}</p>
+                    <p>{% if language == '中文' %}频谱带宽是指信号中频率分布的范围，反映了音频信号的复杂性。{% else %}Spectral Bandwidth indicates the range of frequency distribution in the signal, reflecting the complexity of the audio signal.{% endif %}</p>
+                    <p>{% if language == '中文' %}音调是用来表示声音的高低变化的一个重要特征，它可以帮助我们识别旋律、和弦和音阶。{% else %}Pitch represents the dominant frequency component in the signal, often used to analyze the pitch and musical characteristics of the sound. It helps to distinguish different notes and understand the melody and harmony in music.{% endif %}</p>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <h2><i class="icon fas fa-wave-square"></i> {% if language == '中文' %}音频波形{% else %}Audio Waveform{% endif %}:</h2>
+                <img src="{{ url_for('get_image', filename='waveform.png') }}" alt="{% if language == '中文' %}波形{% else %}Waveform{% endif %}">
+                <p>{% if language == '中文' %}波形表示音频信号的幅度随时间的变化。{% else %}The waveform shows how the amplitude of the audio signal changes over time.{% endif %}</p>
+            </div>
+            <div class="mb-4">
+                <h2><i class="icon fas fa-chart-area"></i> {% if language == '中文' %}音频频谱{% else %}Audio Spectrogram{% endif %}:</h2>
+                <img src="{{ url_for('get_image', filename='spectrogram.png') }}" alt="{% if language == '中文' %}频谱{% else %}Spectrogram{% endif %}">
+                <p>{% if language == '中文' %}频谱图显示音频信号在不同频率上的能量分布，颜色越亮表示该频率的能量越高。{% else %}The spectrogram shows the distribution of energy across different frequencies over time, with brighter colors indicating higher energy.{% endif %}</p>
+            </div>
+            <div class="mb-4">
+                <h2><i class="icon fas fa-chart-pie"></i> {% if language == '中文' %}快速傅里叶变换{% else %}FFT{% endif %}:</h2>
+                <img src="{{ url_for('get_image', filename='fft.png') }}" alt="{% if language == '中文' %}频谱{% else %}Spectrogram{% endif %}">
+                <p>{% if language == '中文' %}快速傅里叶变换 (FFT) 用于将音频信号从时域转换到频域，帮助分析信号的频率成分。{% else %}The Fast Fourier Transform (FFT) is used to convert the audio signal from the time domain to the frequency domain, helping to analyze the frequency components of the signal.{% endif %}</p>
+                <p>{% if language == '中文' %}FFT 图显示了信号中各个频率的幅度，可以用来识别音频的主要频率成分。{% else %}The FFT plot shows the magnitude of each frequency in the signal, which can be used to identify the primary frequency components of the audio.{% endif %}</p>
+                <p>{% if language == '中文' %}快速傅里叶变换的数学公式为：{% else %}The mathematical formula for the Fast Fourier Transform is:{% endif %}</p>
+                <p class="text-highlight text-center"><strong>F(k) = \( \sum_{n=0}^{N-1} f(n) e^{-i \frac{2 \pi k n}{N}} \)</strong></p>
+            </div>
+            
+            <div class="mb-4">
+                <h2><i class="icon fas fa-waveform"></i> {% if language == '中文' %}奇次谐波分析{% else %}Analysis of Odd Harmonics{% endif %}:</h2>
+                <img src="{{ url_for('get_image', filename='individual_harmonics.png') }}" alt="{% if language == '中文' %}奇次谐波{% else %}Odd Harmonics{% endif %}">
+                <p>{% if language == '中文' %}此图显示了前五个奇次谐波的频率分量。{% else %}This plot shows the frequency components of the first five odd harmonics.{% endif %}</p>
+            </div>
+
+            <div class="mb-4">
+                <h2><i class="icon fas fa-plus-circle"></i> {% if language == '中文' %}奇次谐波叠加分析{% else %}Summed Odd Harmonics Analysis{% endif %}:</h2>
+                <img src="{{ url_for('get_image', filename='harmonics.png') }}" alt="{% if language == '中文' %}奇次谐波叠加{% else %}Summed Odd Harmonics{% endif %}">
+                <p>{% if language == '中文' %}此图显示了前五个奇次谐波叠加后的结果。{% else %}This plot shows the result of the summation of the first five odd harmonics.{% endif %}</p>
+            </div>
+        {% endif %}
+        
+        <div class="text-center mt-4">
+            <a href="#" class="btn btn-custom">{% if language == '中文' %}返回主页{% else %}Return to Home{% endif %}</a>
+        </div>
+    </div>
+</body>
+</html>
